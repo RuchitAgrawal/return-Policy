@@ -1,0 +1,256 @@
+@{
+    ViewData["Title"] = "Warehouse Operations Dashboard";
+}
+
+<div class="container-fluid px-4 py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Warehouse & Reverse Logistics Command</h1>
+            <p class="text-muted mb-0">Review AI triage recommendations, manage fraud alerts, and authorize automated inventory sync.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" id="btnRefreshData">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refresh Table
+            </button>
+            <a href="/Staff/Inventory" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-box-seam me-1"></i> Stock Ledger
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. KPI Summary Ribbon -->
+    <div class="row g-3 mb-4" id="kpiRibbon">
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="kpi-tile kpi-primary">
+                <div class="kpi-label">Active RMAs</div>
+                <div class="kpi-value mt-1" id="kpiActiveRmas">--</div>
+                <div class="small text-muted mt-1">Pending / In Review</div>
+            </div>
+        </div>
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="kpi-tile kpi-danger">
+                <div class="kpi-label">Value at Risk</div>
+                <div class="kpi-value mt-1 text-danger" id="kpiValueAtRisk">₹--</div>
+                <div class="small text-muted mt-1">Unapproved claims</div>
+            </div>
+        </div>
+        <div class="col-xl col-md-4 col-sm-6">
+            <div class="kpi-tile kpi-success">
+                <div class="kpi-label">Auto-Resolved Rate</div>
+                <div class="kpi-value mt-1 text-success" id="kpiAutoResolved">--%</div>
+                <div class="small text-muted mt-1">Zero-touch auto RMA</div>
+            </div>
+        </div>
+        <div class="col-xl col-md-6 col-sm-6">
+            <div class="kpi-tile kpi-warning">
+                <div class="kpi-label">High Fraud Alerts</div>
+                <div class="kpi-value mt-1 text-warning" id="kpiFraudAlerts">--</div>
+                <div class="small text-muted mt-1">Quarantined for abuse</div>
+            </div>
+        </div>
+        <div class="col-xl col-md-6 col-sm-12">
+            <div class="kpi-tile kpi-teal">
+                <div class="kpi-label">Stock on Hand</div>
+                <div class="kpi-value mt-1 text-teal" id="kpiStockRecovered">--</div>
+                <div class="small text-muted mt-1">Total sellable inventory</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Filter Bar & Search -->
+    <div class="rf-card p-3 mb-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="filterSearchInput" class="form-control" placeholder="Search ticket, customer, SKU..." />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select id="filterStatusSelect" class="form-select form-select-sm">
+                    <option value="All">All Statuses</option>
+                    <option value="PendingReview">Pending Review</option>
+                    <option value="AutoApproved">Auto Approved</option>
+                    <option value="StaffApproved">Staff Approved</option>
+                    <option value="QuarantinedForFraud">Quarantined for Fraud</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="filterFraudSelect" class="form-select form-select-sm">
+                    <option value="All">All Fraud Risk Levels</option>
+                    <option value="High">High Risk Only</option>
+                    <option value="Medium">Medium Risk</option>
+                    <option value="Low">Low Risk</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="filterChannelSelect" class="form-select form-select-sm">
+                    <option value="All">All Sales Channels</option>
+                    <option value="Shopify">Shopify</option>
+                    <option value="AmazonIN">Amazon India</option>
+                    <option value="B2BWholesale">B2B Wholesale</option>
+                    <option value="DirectWeb">Direct Web</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Main Split-Pane Layout -->
+    <div class="row g-3">
+        <!-- Table Column -->
+        <div class="col-xl-7 col-lg-6" id="tableColumn">
+            <div class="rf-card overflow-hidden">
+                <div class="table-responsive" style="max-height: 650px;">
+                    <table class="table rf-table align-middle" id="rmaTable">
+                        <thead>
+                            <tr>
+                                <th>Ticket #</th>
+                                <th>Customer & Product</th>
+                                <th>Channel</th>
+                                <th>Status</th>
+                                <th>Fraud Risk</th>
+                                <th>Refund</th>
+                                <th>Delivered</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rmaTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <div class="spinner-border spinner-border-sm me-2"></div> Loading RMA tickets...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inspector Split-Pane Column -->
+        <div class="col-xl-5 col-lg-6" id="inspectorColumn">
+            <div class="inspector-panel p-4 sticky-top" style="top: 80px;" id="inspectorPanel">
+                <!-- Empty Placeholder -->
+                <div class="text-center py-5" id="inspectorPlaceholder">
+                    <div class="text-muted mb-3 opacity-50">
+                        <i class="bi bi-layout-sidebar-inset-reverse" style="font-size: 3rem;"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">Select an RMA Ticket</h6>
+                    <p class="text-muted small mb-0">Click any row in the table to inspect SQL relational data and execute AI-guided inventory decisions.</p>
+                </div>
+
+                <!-- Active Ticket Details -->
+                <div class="d-none" id="inspectorDetails">
+                    <div class="d-flex justify-content-between align-items-start pb-3 mb-3 border-bottom">
+                        <div>
+                            <span class="badge bg-secondary-subtle text-secondary font-mono mb-1" id="inspTicketNumber">RMA-0000</span>
+                            <h5 class="fw-bold mb-0" id="inspProductName">Product Name</h5>
+                            <span class="text-muted small" id="inspCustomerOrder">Customer • Order</span>
+                        </div>
+                        <span class="badge rounded-pill px-3 py-1.5" id="inspStatusBadge">Status</span>
+                    </div>
+
+                    <!-- Side-by-side tabs/sections: Left SQL Facts vs Right AI Decision -->
+                    <div class="row g-3 mb-3">
+                        <!-- Left: Relational Order Metadata -->
+                        <div class="col-12 bg-light p-3 rounded-3">
+                            <span class="fw-bold small text-uppercase text-muted d-block mb-2">
+                                <i class="bi bi-database me-1"></i> SQL Relational Facts
+                            </span>
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Delivered:</span>
+                                    <span class="fw-semibold" id="inspDeliveredDate">--</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Days Since:</span>
+                                    <span class="fw-semibold" id="inspDaysSince">--</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Return Window:</span>
+                                    <span class="fw-semibold" id="inspReturnWindow">--</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Warranty Window:</span>
+                                    <span class="fw-semibold" id="inspWarrantyWindow">--</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Eligible Refund:</span>
+                                    <span class="fw-bold text-success" id="inspRefundAmount">₹0.00</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Restocking Fee:</span>
+                                    <span class="fw-bold text-danger" id="inspRestockingFee">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Raw Complaint Box -->
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted mb-1">
+                                <i class="bi bi-chat-left-quote me-1"></i> Raw Customer Complaint
+                            </label>
+                            <div class="p-2.5 border rounded-3 bg-white small text-secondary fst-italic" id="inspComplaintText"></div>
+                        </div>
+
+                        <!-- Right: AI Structured Extraction -->
+                        <div class="col-12">
+                            <span class="fw-bold small text-uppercase text-muted d-block mb-2">
+                                <i class="bi bi-cpu me-1"></i> AI Structured Triage
+                            </span>
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <span class="badge" id="inspFraudBadge">Fraud: --</span>
+                                <span class="badge bg-light text-dark border" id="inspCategoryBadge">Category: --</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" id="inspActionBadge">Action: --</span>
+                                <span class="badge bg-secondary text-white" id="inspRoutingBadge">Routing: --</span>
+                            </div>
+
+                            <!-- Sentiment Score -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Escalation Risk / Sentiment:</span>
+                                    <span class="fw-bold font-mono" id="inspSentimentScore">0/10</span>
+                                </div>
+                                <div class="sentiment-gauge">
+                                    <div class="sentiment-fill" id="inspSentimentFill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 bg-light rounded-3 small text-secondary mb-3" id="inspReasoningText"></div>
+                        </div>
+
+                        <!-- Editable Customer Email Draft -->
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted mb-1 d-flex justify-content-between">
+                                <span><i class="bi bi-envelope me-1"></i> Customer Response Email (Editable)</span>
+                                <span class="badge bg-light text-muted border">AI Generated</span>
+                            </label>
+                            <textarea class="form-control form-control-sm font-mono small" id="inspEmailText" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Decision Buttons -->
+                    <div class="d-flex flex-column gap-2 pt-2 border-top">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm flex-grow-1 fw-bold d-flex align-items-center justify-content-center gap-1" id="btnApproveSync">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Approve & Sync Inventory</span>
+                            </button>
+                            <button class="btn btn-warning btn-sm flex-grow-1 fw-bold text-dark d-flex align-items-center justify-content-center gap-1" id="btnApplyRestocking">
+                                <i class="bi bi-percent"></i>
+                                <span>Apply 15% Fee</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm w-100 fw-semibold" id="btnRejectClaim">
+                            <i class="bi bi-x-circle me-1"></i> Reject Out-of-Policy Claim
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/staff-dashboard.js" asp-append-version="true"></script>
+}
