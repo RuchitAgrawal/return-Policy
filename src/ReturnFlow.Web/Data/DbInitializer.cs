@@ -278,7 +278,32 @@ public static class DbInitializer
             AiDraftedCustomerEmail = "Dear Priya Patel,\n\nYour return request regarding order ORD-2026-1002 has been flagged for supervisor review. Accidental drop damage is not covered under the limited hardware warranty policy. Our operations team will contact you shortly."
         };
 
-        context.RmaTickets.AddRange(t1, t2, t3);
+        // Ticket 4: PendingReview - Transit Damage
+        var t4 = new RmaTicket
+        {
+            TicketNumber = "RMA-9004",
+            OrderId = o5.Id,
+            OrderLineItemId = li5_1.Id,
+            CreatedAt = now.AddHours(-1),
+            Status = RmaStatus.PendingReview,
+            CustomerComplaintRawText = "The shipping parcel arrived badly crushed on the side and the outer bezel is dented. Requesting replacement unit.",
+            RequestedResolution = RequestedResolution.Replacement,
+            ConditionReportedByCustomer = ConditionReported.Defective,
+            DaysSinceDelivery = 2,
+            IsWithinReturnWindow = true,
+            IsWithinWarrantyWindow = true,
+            CalculatedRefundAmount = 38000.00m,
+            RestockingFeeAmount = 0.00m,
+            AiExtractedDefectCategory = DefectCategory.ShippingDamage,
+            AiSentimentScore = 5,
+            AiFraudRiskLevel = FraudRiskLevel.Low,
+            AiRecommendedAction = RecommendedAction.ApproveReplacement,
+            WarehouseRoutingAction = WarehouseRoutingAction.SendToRefurbish,
+            AiReasoningSummary = "Courier transit damage reported within 48 hours of delivery. Eligible for immediate expedited courier replacement with zero fees.",
+            AiDraftedCustomerEmail = "Dear Customer,\n\nWe are sorry to hear that your parcel arrived damaged in transit. We have initiated a replacement order and scheduled a reverse pickup for the damaged item."
+        };
+
+        context.RmaTickets.AddRange(t1, t2, t3, t4);
         await context.SaveChangesAsync();
     }
 }

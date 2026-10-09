@@ -105,6 +105,7 @@ public record RmaListItemDto(
     string Status,
     string? FraudRiskLevel,
     string? RecommendedAction,
+    string? DefectCategory,
     decimal CalculatedRefundAmount,
     DateTime CreatedAt
 );

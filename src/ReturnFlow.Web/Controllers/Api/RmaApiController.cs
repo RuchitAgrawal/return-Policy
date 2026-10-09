@@ -231,6 +231,7 @@ public class RmaApiController : ControllerBase
                 t.Status.ToString(),
                 t.AiFraudRiskLevel.HasValue ? t.AiFraudRiskLevel.Value.ToString() : null,
                 t.AiRecommendedAction.HasValue ? t.AiRecommendedAction.Value.ToString() : null,
+                t.AiExtractedDefectCategory.HasValue ? t.AiExtractedDefectCategory.Value.ToString() : null,
                 t.CalculatedRefundAmount,
                 t.CreatedAt
             ))
