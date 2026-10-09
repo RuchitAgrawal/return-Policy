@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterSearchInput = document.getElementById('filterSearchInput');
     const filterFraudSelect = document.getElementById('filterFraudSelect');
     const filterChannelSelect = document.getElementById('filterChannelSelect');
-    const btnRefreshData = document.getElementById('btnRefreshData');
     const statusPillTabs = document.getElementById('statusPillTabs');
+    const btnExportCsv = document.getElementById('btnExportCsv');
 
     const rmaTableBody = document.getElementById('rmaTableBody');
 
@@ -51,10 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchKpis();
     fetchTickets();
 
-    btnRefreshData.addEventListener('click', () => {
-        fetchKpis();
-        fetchTickets();
-    });
+    if (btnExportCsv) {
+        btnExportCsv.addEventListener('click', exportClaimsCsv);
+    }
 
     if (statusPillTabs) {
         statusPillTabs.addEventListener('click', (e) => {
@@ -83,7 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             kpiActiveRmas.textContent = kpis.totalActiveRmas;
             kpiValueAtRisk.textContent = `₹${Number(kpis.totalValueAtRisk).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-            kpiAutoResolved.textContent = `${kpis.autoResolvedPercent}%`;
+            
+            if (kpis.autoResolvedPercent > 0) {
+                kpiAutoResolved.textContent = `${kpis.autoResolvedPercent}%`;
+                kpiAutoResolved.className = 'fw-bold font-mono text-success';
+            } else {
+                kpiAutoResolved.textContent = '0%';
+                kpiAutoResolved.className = 'fw-bold font-mono text-dark';
+            }
+            
             kpiStockRecovered.textContent = kpis.stockRecovered;
         } catch (e) {
             console.error('Failed to load KPIs:', e);
@@ -216,10 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
         inspComplaintText.textContent = `"${t.customerComplaintRawText}"`;
 
         const fraudRisk = t.aiFraudRiskLevel || 'Low';
-        inspFraudBadge.textContent = `Fraud: ${fraudRisk}`;
+        inspFraudBadge.textContent = `Risk: ${fraudRisk}`;
         inspFraudBadge.className = 'badge-pill-dark ' + getFraudBadgeClass(fraudRisk);
 
-        inspCategoryBadge.textContent = `Category: ${t.aiExtractedDefectCategory || 'General'}`;
+        inspCategoryBadge.textContent = `Category: ${formatEnumLabel(t.aiExtractedDefectCategory || 'General')}`;
         inspActionBadge.textContent = `Action: ${formatEnumLabel(t.aiRecommendedAction)}`;
         inspRoutingBadge.textContent = `Routing: ${formatEnumLabel(t.warehouseRoutingAction)}`;
 
@@ -228,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inspSentimentFill.style.width = `${score * 10}%`;
         inspSentimentFill.style.backgroundColor = getSentimentColor(score);
 
-        inspReasoningText.textContent = t.aiReasoningSummary || 'Deterministic verification completed.';
+        inspReasoningText.textContent = t.aiReasoningSummary || 'Policy verification completed.';
         inspEmailText.value = t.aiDraftedCustomerEmail || '';
     }
 
@@ -316,13 +323,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const defectCounts = {};
         tickets.forEach(t => {
-            const cat = t.aiExtractedDefectCategory || 'General';
+            const rawCat = t.defectCategory || t.aiExtractedDefectCategory || 'General';
+            const cat = formatEnumLabel(rawCat);
             defectCounts[cat] = (defectCounts[cat] || 0) + 1;
         });
 
         const defectLabels = Object.keys(defectCounts);
         const defectData = Object.values(defectCounts);
-        const defectColors = ['#f55036', '#dc2626', '#0066ff', '#64748b', '#00c5ff', '#10b981'];
+        const defectColors = ['#4f46e5', '#10b981', '#f59e0b', '#f43f5e', '#0284c7', '#64748b'];
 
         const defectCanvas = document.getElementById('defectCategoryChart');
         if (defectCanvas) {
@@ -385,7 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         datasets: [{
                             label: 'Exposure (₹)',
                             data: channelData,
-                            backgroundColor: '#0a0a0a',
+                            backgroundColor: '#334155',
+                            hoverBackgroundColor: '#0284c7',
                             borderRadius: 6,
                             borderSkipped: false
                         }]
@@ -406,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ticks: {
                                     font: { family: 'JetBrains Mono', size: 11 },
                                     color: '#64748b',
+                                    maxTicksLimit: 5,
                                     callback: (val) => '₹' + Number(val).toLocaleString('en-IN')
                                 }
                             }
@@ -414,6 +424,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         }
+    }
+
+    function exportClaimsCsv() {
+        if (!ticketsCache || ticketsCache.length === 0) {
+            alert('No tickets available to export.');
+            return;
+        }
+
+        const headers = ['TicketNumber', 'CustomerName', 'Product', 'SKU', 'SalesChannel', 'Status', 'RiskLevel', 'RefundAmount', 'DaysSinceDelivery', 'CreatedAt'];
+        const rows = ticketsCache.map(t => [
+            t.ticketNumber,
+            `"${(t.customerName || '').replace(/"/g, '""')}"`,
+            `"${(t.productName || '').replace(/"/g, '""')}"`,
+            t.sku,
+            t.salesChannel,
+            t.status,
+            t.fraudRiskLevel || 'Low',
+            t.calculatedRefundAmount,
+            t.daysSinceDelivery,
+            t.createdAt
+        ]);
+
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `returnflow_claims_${Date.now()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     document.addEventListener('keydown', (e) => {
