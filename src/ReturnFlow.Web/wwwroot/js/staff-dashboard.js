@@ -1,27 +1,17 @@
-/**
- * ReturnFlow AI — Warehouse Operations Dashboard
- * Pure Vanilla JavaScript (ES6+) with Fetch API & Direct DOM Manipulation
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // KPI Elements
     const kpiActiveRmas = document.getElementById('kpiActiveRmas');
     const kpiValueAtRisk = document.getElementById('kpiValueAtRisk');
     const kpiAutoResolved = document.getElementById('kpiAutoResolved');
-    const kpiFraudAlerts = document.getElementById('kpiFraudAlerts');
     const kpiStockRecovered = document.getElementById('kpiStockRecovered');
 
-    // Filter Elements
     const filterSearchInput = document.getElementById('filterSearchInput');
-    const filterStatusSelect = document.getElementById('filterStatusSelect');
     const filterFraudSelect = document.getElementById('filterFraudSelect');
     const filterChannelSelect = document.getElementById('filterChannelSelect');
     const btnRefreshData = document.getElementById('btnRefreshData');
+    const statusPillTabs = document.getElementById('statusPillTabs');
 
-    // Table Elements
     const rmaTableBody = document.getElementById('rmaTableBody');
 
-    // Inspector Elements
     const inspectorPlaceholder = document.getElementById('inspectorPlaceholder');
     const inspectorDetails = document.getElementById('inspectorDetails');
     const inspTicketNumber = document.getElementById('inspTicketNumber');
@@ -46,15 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const inspReasoningText = document.getElementById('inspReasoningText');
     const inspEmailText = document.getElementById('inspEmailText');
 
-    // Action Buttons
     const btnApproveSync = document.getElementById('btnApproveSync');
     const btnApplyRestocking = document.getElementById('btnApplyRestocking');
     const btnRejectClaim = document.getElementById('btnRejectClaim');
+    const btnInspPrintLabel = document.getElementById('btnInspPrintLabel');
 
     let ticketsCache = [];
     let selectedTicketId = null;
+    let currentStatusFilter = 'All';
 
-    // ── 1. Initial Data Fetch ────────────────────────────────────────────────
+    let defectChartInstance = null;
+    let channelChartInstance = null;
+
     fetchKpis();
     fetchTickets();
 
@@ -63,7 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchTickets();
     });
 
-    // ── 2. KPI Ribbon Data ───────────────────────────────────────────────────
+    if (statusPillTabs) {
+        statusPillTabs.addEventListener('click', (e) => {
+            const btn = e.target.closest('.pill-tab-item');
+            if (!btn) return;
+
+            statusPillTabs.querySelectorAll('.pill-tab-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            currentStatusFilter = btn.getAttribute('data-status') || 'All';
+            applyFilters();
+        });
+    }
+
+    [filterSearchInput, filterFraudSelect, filterChannelSelect].forEach(el => {
+        if (!el) return;
+        el.addEventListener('input', applyFilters);
+        el.addEventListener('change', applyFilters);
+    });
+
     async function fetchKpis() {
         try {
             const res = await fetch('/api/inventory/kpis');
@@ -73,20 +84,19 @@ document.addEventListener('DOMContentLoaded', () => {
             kpiActiveRmas.textContent = kpis.totalActiveRmas;
             kpiValueAtRisk.textContent = `₹${Number(kpis.totalValueAtRisk).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
             kpiAutoResolved.textContent = `${kpis.autoResolvedPercent}%`;
-            kpiFraudAlerts.textContent = kpis.highFraudAlerts;
             kpiStockRecovered.textContent = kpis.stockRecovered;
         } catch (e) {
             console.error('Failed to load KPIs:', e);
         }
     }
 
-    // ── 3. Table Data ────────────────────────────────────────────────────────
     async function fetchTickets() {
         try {
             const res = await fetch('/api/rma');
             if (!res.ok) throw new Error('Failed to load tickets');
             ticketsCache = await res.json();
             renderTableRows(ticketsCache);
+            initOrUpdateCharts(ticketsCache);
         } catch (e) {
             rmaTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">${e.message}</td></tr>`;
         }
@@ -94,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTableRows(tickets) {
         if (!tickets || tickets.length === 0) {
-            rmaTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No RMA tickets found matching filter.</td></tr>`;
+            rmaTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-steel py-4">No RMA tickets found matching filter.</td></tr>`;
             return;
         }
 
@@ -116,16 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const fraudClass = getFraudBadgeClass(t.fraudRiskLevel);
 
             tr.innerHTML = `
-                <td class="font-mono fw-bold text-primary">${escapeHtml(t.ticketNumber)}</td>
+                <td class="font-mono fw-bold text-dark">${escapeHtml(t.ticketNumber)}</td>
                 <td>
                     <div class="fw-semibold">${escapeHtml(t.customerName)}</div>
-                    <div class="text-muted small font-mono">${escapeHtml(t.productName)} (${escapeHtml(t.sku)})</div>
+                    <div class="text-steel small font-mono">${escapeHtml(t.productName)} (${escapeHtml(t.sku)})</div>
                 </td>
-                <td><span class="badge bg-light text-dark border">${escapeHtml(t.salesChannel)}</span></td>
-                <td><span class="badge rounded-pill px-2.5 py-1 ${statusClass}" id="rowBadge_${t.id}">${escapeHtml(t.status)}</span></td>
-                <td><span class="badge ${fraudClass}">${escapeHtml(t.fraudRiskLevel || 'Low')}</span></td>
+                <td><span class="badge-pill-neutral font-mono">${escapeHtml(t.salesChannel)}</span></td>
+                <td><span class="badge-pill-neutral ${statusClass}" id="rowBadge_${t.id}">${escapeHtml(t.status)}</span></td>
+                <td><span class="badge-pill-neutral ${fraudClass}">${escapeHtml(t.fraudRiskLevel || 'Low')}</span></td>
                 <td class="fw-bold text-success font-mono">₹${Number(t.calculatedRefundAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td class="text-muted small">${t.daysSinceDelivery}d ago</td>
+                <td class="text-steel small">${t.daysSinceDelivery}d ago</td>
             `;
 
             tr.addEventListener('click', () => {
@@ -134,19 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rmaTableBody.appendChild(tr);
         });
+
+        applyFilters();
     }
 
-    // ── 4. Client-side DOM Filtering ─────────────────────────────────────────
-    [filterSearchInput, filterStatusSelect, filterFraudSelect, filterChannelSelect].forEach(el => {
-        el.addEventListener('input', applyFilters);
-        el.addEventListener('change', applyFilters);
-    });
-
     function applyFilters() {
-        const query = filterSearchInput.value.trim().toLowerCase();
-        const status = filterStatusSelect.value;
-        const fraud = filterFraudSelect.value;
-        const channel = filterChannelSelect.value;
+        const query = (filterSearchInput?.value || '').trim().toLowerCase();
+        const fraud = filterFraudSelect?.value || 'All';
+        const channel = filterChannelSelect?.value || 'All';
 
         const rows = rmaTableBody.querySelectorAll('tr[data-id]');
         rows.forEach(row => {
@@ -156,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rChannel = row.getAttribute('data-channel') || '';
 
             const matchQuery = !query || rSearch.includes(query);
-            const matchStatus = status === 'All' || rStatus.toLowerCase() === status.toLowerCase();
+            const matchStatus = currentStatusFilter === 'All' || rStatus.toLowerCase() === currentStatusFilter.toLowerCase();
             const matchFraud = fraud === 'All' || rFraud.toLowerCase() === fraud.toLowerCase();
             const matchChannel = channel === 'All' || rChannel.toLowerCase() === channel.toLowerCase();
 
@@ -168,11 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── 5. Row Selection & Detail Panel Loading ─────────────────────────────
     async function selectTicketRow(ticketId) {
         selectedTicketId = ticketId;
 
-        // Visual selection in table
         rmaTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('row-selected'));
         const activeRow = document.getElementById(`row_${ticketId}`);
         if (activeRow) activeRow.classList.add('row-selected');
@@ -193,13 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         inspTicketNumber.textContent = t.ticketNumber;
         inspProductName.textContent = t.productName;
-        inspCustomerOrder.textContent = `${t.customerName} • ${t.orderNumber} (${t.salesChannel})`;
+        inspCustomerOrder.textContent = `${t.customerName} | ${t.orderNumber} (${t.salesChannel})`;
 
-        // Badges
         inspStatusBadge.textContent = t.status;
-        inspStatusBadge.className = 'badge rounded-pill px-3 py-1.5 ' + getStatusBadgeClass(t.status);
+        inspStatusBadge.className = 'badge-pill-dark ' + getStatusBadgeClass(t.status);
 
-        // SQL Relational Facts
         inspDeliveredDate.textContent = new Date(t.deliveredDate).toLocaleDateString();
         inspDaysSince.textContent = `${t.daysSinceDelivery} days`;
         inspReturnWindow.innerHTML = t.isWithinReturnWindow
@@ -214,29 +215,54 @@ document.addEventListener('DOMContentLoaded', () => {
         inspRestockingFee.textContent = `₹${Number(t.restockingFeeAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
         inspComplaintText.textContent = `"${t.customerComplaintRawText}"`;
 
-        // AI Structured Extraction
         const fraudRisk = t.aiFraudRiskLevel || 'Low';
         inspFraudBadge.textContent = `Fraud: ${fraudRisk}`;
-        inspFraudBadge.className = 'badge ' + getFraudBadgeClass(fraudRisk);
+        inspFraudBadge.className = 'badge-pill-dark ' + getFraudBadgeClass(fraudRisk);
 
-        inspCategoryBadge.textContent = `Defect: ${t.aiExtractedDefectCategory || 'General'}`;
+        inspCategoryBadge.textContent = `Category: ${t.aiExtractedDefectCategory || 'General'}`;
         inspActionBadge.textContent = `Action: ${formatEnumLabel(t.aiRecommendedAction)}`;
         inspRoutingBadge.textContent = `Routing: ${formatEnumLabel(t.warehouseRoutingAction)}`;
 
-        // Sentiment
         const score = Math.max(1, Math.min(10, t.aiSentimentScore || 5));
         inspSentimentScore.textContent = `${score}/10`;
         inspSentimentFill.style.width = `${score * 10}%`;
         inspSentimentFill.style.backgroundColor = getSentimentColor(score);
 
-        inspReasoningText.textContent = t.aiReasoningSummary || 'Deterministic verification.';
+        inspReasoningText.textContent = t.aiReasoningSummary || 'Deterministic verification completed.';
         inspEmailText.value = t.aiDraftedCustomerEmail || '';
     }
 
-    // ── 6. Decision Action Handlers (PATCH /api/rma/{id}/decision) ───────────
     btnApproveSync.addEventListener('click', () => executeDecision('Approve'));
     btnApplyRestocking.addEventListener('click', () => executeDecision('ApplyRestockingFee'));
     btnRejectClaim.addEventListener('click', () => executeDecision('Reject'));
+
+    if (btnInspPrintLabel) {
+        btnInspPrintLabel.addEventListener('click', () => {
+            if (!selectedTicketId) return;
+            const currentTicket = ticketsCache.find(t => t.id === selectedTicketId);
+            if (!currentTicket) return;
+
+            const labelRma = document.getElementById('labelRmaNumber');
+            const labelCust = document.getElementById('labelCustomerName');
+            const labelOrder = document.getElementById('labelOrderRef');
+            const labelSku = document.getElementById('labelProductSku');
+            const labelRouting = document.getElementById('labelRoutingAction');
+            const labelBarcode = document.getElementById('labelBarcodeText');
+
+            if (labelRma) labelRma.textContent = currentTicket.ticketNumber;
+            if (labelCust) labelCust.textContent = currentTicket.customerName;
+            if (labelOrder) labelOrder.textContent = `Order ${currentTicket.orderNumber}`;
+            if (labelSku) labelSku.textContent = `${currentTicket.sku} | ${currentTicket.productName}`;
+            if (labelRouting) labelRouting.textContent = formatEnumLabel(currentTicket.warehouseRoutingAction || 'RETURN TO WAREHOUSE').toUpperCase();
+            if (labelBarcode) labelBarcode.textContent = `*DEL-${currentTicket.ticketNumber}-EXPEDITED*`;
+
+            const modalEl = document.getElementById('carrierLabelModal');
+            if (modalEl) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    }
 
     async function executeDecision(actionName) {
         if (!selectedTicketId) return;
@@ -255,31 +281,201 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await res.json();
 
-            // 1. In-DOM badge update on inspector & row
             inspStatusBadge.textContent = result.newStatus;
-            inspStatusBadge.className = 'badge rounded-pill px-3 py-1.5 ' + getStatusBadgeClass(result.newStatus);
+            inspStatusBadge.className = 'badge-pill-dark ' + getStatusBadgeClass(result.newStatus);
 
             const rowBadge = document.getElementById(`rowBadge_${selectedTicketId}`);
             if (rowBadge) {
                 rowBadge.textContent = result.newStatus;
-                rowBadge.className = 'badge rounded-pill px-2.5 py-1 ' + getStatusBadgeClass(result.newStatus);
-                // Animate row
+                rowBadge.className = 'badge-pill-neutral ' + getStatusBadgeClass(result.newStatus);
+
                 const row = document.getElementById(`row_${selectedTicketId}`);
                 if (row) {
                     row.setAttribute('data-status', result.newStatus);
-                    row.classList.add('table-success');
-                    setTimeout(() => row.classList.remove('table-success'), 1200);
+                    row.classList.add('table-light');
+                    setTimeout(() => row.classList.remove('table-light'), 1200);
                 }
             }
 
-            // 2. Refresh top KPI ribbon
-            fetchKpis();
+            const cached = ticketsCache.find(t => t.id === selectedTicketId);
+            if (cached) {
+                cached.status = result.newStatus;
+            }
 
-            // 3. Show Toast notification with exact SQL inventory change
+            fetchKpis();
+            initOrUpdateCharts(ticketsCache);
             showToast(result.stockUpdateMessage || result.message);
 
         } catch (e) {
             alert(`Decision error: ${e.message}`);
+        }
+    }
+
+    function initOrUpdateCharts(tickets) {
+        if (!window.Chart || !tickets || tickets.length === 0) return;
+
+        const defectCounts = {};
+        tickets.forEach(t => {
+            const cat = t.aiExtractedDefectCategory || 'General';
+            defectCounts[cat] = (defectCounts[cat] || 0) + 1;
+        });
+
+        const defectLabels = Object.keys(defectCounts);
+        const defectData = Object.values(defectCounts);
+        const defectColors = ['#f55036', '#dc2626', '#0066ff', '#64748b', '#00c5ff', '#10b981'];
+
+        const defectCanvas = document.getElementById('defectCategoryChart');
+        if (defectCanvas) {
+            if (defectChartInstance) {
+                defectChartInstance.data.labels = defectLabels;
+                defectChartInstance.data.datasets[0].data = defectData;
+                defectChartInstance.update();
+            } else {
+                defectChartInstance = new Chart(defectCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: defectLabels,
+                        datasets: [{
+                            data: defectData,
+                            backgroundColor: defectColors.slice(0, defectLabels.length),
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 10,
+                                    font: { family: 'DM Sans', size: 12 },
+                                    color: '#475569'
+                                }
+                            }
+                        },
+                        cutout: '68%'
+                    }
+                });
+            }
+        }
+
+        const channelRisk = {};
+        tickets.forEach(t => {
+            const ch = t.salesChannel || 'DirectWeb';
+            const val = Number(t.calculatedRefundAmount || 0);
+            channelRisk[ch] = (channelRisk[ch] || 0) + val;
+        });
+
+        const channelLabels = Object.keys(channelRisk);
+        const channelData = Object.values(channelRisk);
+
+        const channelCanvas = document.getElementById('channelRiskChart');
+        if (channelCanvas) {
+            if (channelChartInstance) {
+                channelChartInstance.data.labels = channelLabels;
+                channelChartInstance.data.datasets[0].data = channelData;
+                channelChartInstance.update();
+            } else {
+                channelChartInstance = new Chart(channelCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: channelLabels,
+                        datasets: [{
+                            label: 'Exposure (₹)',
+                            data: channelData,
+                            backgroundColor: '#0a0a0a',
+                            borderRadius: 6,
+                            borderSkipped: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: 'DM Sans', size: 11 }, color: '#64748b' }
+                            },
+                            y: {
+                                grid: { color: '#e2e8f0' },
+                                ticks: {
+                                    font: { family: 'JetBrains Mono', size: 11 },
+                                    color: '#64748b',
+                                    callback: (val) => '₹' + Number(val).toLocaleString('en-IN')
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        const isEditing = activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select';
+
+        if (e.key === '/' && !isEditing) {
+            e.preventDefault();
+            filterSearchInput?.focus();
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            if (isEditing) {
+                document.activeElement.blur();
+            } else {
+                inspectorDetails.classList.add('d-none');
+                inspectorPlaceholder.classList.remove('d-none');
+                rmaTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('row-selected'));
+                selectedTicketId = null;
+            }
+            return;
+        }
+
+        if (isEditing) return;
+
+        if (e.key === 'a' || e.key === 'A') {
+            e.preventDefault();
+            if (selectedTicketId) executeDecision('Approve');
+        } else if (e.key === 'r' || e.key === 'R') {
+            e.preventDefault();
+            if (selectedTicketId) executeDecision('Reject');
+        } else if (e.key === 'j' || e.key === 'J') {
+            e.preventDefault();
+            navigateRows(1);
+        } else if (e.key === 'k' || e.key === 'K') {
+            e.preventDefault();
+            navigateRows(-1);
+        }
+    });
+
+    function navigateRows(direction) {
+        const visibleRows = Array.from(rmaTableBody.querySelectorAll('tr[data-id]'))
+            .filter(r => r.style.display !== 'none');
+        if (visibleRows.length === 0) return;
+
+        let currentIndex = visibleRows.findIndex(r => r.getAttribute('data-id') === String(selectedTicketId));
+        let nextIndex;
+
+        if (currentIndex === -1) {
+            nextIndex = direction > 0 ? 0 : visibleRows.length - 1;
+        } else {
+            nextIndex = currentIndex + direction;
+            if (nextIndex < 0) nextIndex = 0;
+            if (nextIndex >= visibleRows.length) nextIndex = visibleRows.length - 1;
+        }
+
+        const targetRow = visibleRows[nextIndex];
+        if (targetRow) {
+            const ticketId = parseInt(targetRow.getAttribute('data-id'), 10);
+            selectTicketRow(ticketId);
+            targetRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
 
@@ -289,10 +485,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const toastId = 'toast_' + Date.now();
         const toastHtml = `
-            <div id="${toastId}" class="toast align-items-center text-bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="${toastId}" class="toast align-items-center text-bg-dark border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 9999px; padding: 4px 12px;">
                 <div class="d-flex">
-                    <div class="toast-body d-flex align-items-center gap-2">
-                        <i class="bi bi-box-seam-fill text-info fs-5"></i>
+                    <div class="toast-body d-flex align-items-center gap-2 small">
+                        <i class="bi bi-box-seam-fill text-info"></i>
                         <span>${escapeHtml(msg)}</span>
                     </div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -302,12 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         toastContainer.insertAdjacentHTML('beforeend', toastHtml);
         const toastEl = document.getElementById(toastId);
-        const bsToast = new bootstrap.Toast(toastEl, { delay: 6000 });
+        const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
         bsToast.show();
         toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
     }
 
-    // Helper functions
     function getStatusBadgeClass(status) {
         switch (status) {
             case 'AutoApproved': return 'badge-auto-approved';
@@ -315,27 +510,27 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'PendingReview': return 'badge-pending';
             case 'QuarantinedForFraud': return 'badge-quarantined';
             case 'Rejected': return 'badge-rejected';
-            default: return 'bg-secondary text-white';
+            default: return 'text-steel';
         }
     }
 
     function getFraudBadgeClass(risk) {
         switch (risk?.toLowerCase()) {
-            case 'high': return 'bg-danger text-white';
-            case 'medium': return 'bg-warning text-dark';
-            case 'low': return 'bg-success text-white';
-            default: return 'bg-secondary text-white';
+            case 'high': return 'badge-pill-coral text-white';
+            case 'medium': return 'badge-pill-neutral fw-bold';
+            case 'low': return 'badge-pill-neutral text-success';
+            default: return 'badge-pill-neutral';
         }
     }
 
     function getSentimentColor(score) {
         if (score <= 3) return '#10b981';
         if (score <= 6) return '#f59e0b';
-        return '#f43f5e';
+        return '#f55036';
     }
 
     function formatEnumLabel(str) {
-        if (!str) return '--';
+        if (!str) return 'General';
         return str.replace(/([A-Z])/g, ' $1').trim();
     }
 
