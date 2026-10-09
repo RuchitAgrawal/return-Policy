@@ -3,104 +3,101 @@
     ViewData["Title"] = "Live Inventory Ledger";
 }
 
-<div class="container-fluid px-4 py-3">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+<div class="container-fluid px-lg-4 px-3 py-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4 pb-2">
         <div>
-            <h1 class="h3 fw-bold mb-1">Live Stock & Reverse Logistics Ledger</h1>
-            <p class="text-muted mb-0">Real-time sellable vs damaged stock on hand with calculated SQL RMA return rates.</p>
+            <span class="fs-micro text-steel d-block mb-1">Warehouse Operations Command</span>
+            <h1 class="heading-lg mb-0">Live Stock & Reverse Logistics Ledger</h1>
         </div>
-        <div class="d-flex gap-2">
-            <a href="/Staff/Dashboard" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-kanban me-1"></i> Staff Dashboard
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="/Staff/Dashboard" class="btn-minimax-secondary text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Triage Command
             </a>
-            <a href="/Rma/Submit" class="btn btn-primary btn-sm">
+            <a href="/Rma/Submit" class="btn-minimax-primary text-decoration-none">
                 <i class="bi bi-plus-circle me-1"></i> Customer Portal
             </a>
         </div>
     </div>
 
-    <!-- Inventory Table -->
-    <div class="rf-card overflow-hidden">
+    <div class="card-base p-0 overflow-hidden">
         <div class="table-responsive">
-            <table class="table rf-table align-middle">
+            <table class="table-minimax align-middle">
                 <thead>
                     <tr>
                         <th>Product / SKU</th>
                         <th>Category</th>
                         <th>Unit Price (INR)</th>
-                        <th>Warranty</th>
+                        <th>Warranty Window</th>
                         <th class="text-center">Sellable Stock</th>
                         <th class="text-center">Damaged / RMA Stock</th>
-                        <th>RMA Return Rate</th>
-                        <th>Health Status</th>
+                        <th>Return Rate Exposure</th>
+                        <th>Stock Health</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var p in Model)
                     {
-                        var stockHealthClass = p.CurrentStockOnHand > 50 ? "bg-success" : (p.CurrentStockOnHand > 15 ? "bg-primary" : "bg-warning");
-                        var returnRateColor = p.ReturnRatePercent > 10m ? "text-danger" : (p.ReturnRatePercent > 0m ? "text-warning" : "text-success");
+                        var returnRateColor = p.ReturnRatePercent > 10m ? "text-danger" : (p.ReturnRatePercent > 0m ? "text-dark" : "text-success");
                         <tr>
                             <td>
-                                <div class="fw-bold">@p.Name</div>
-                                <span class="font-mono text-muted small">@p.Sku</span>
+                                <div class="fw-semibold text-dark">@p.Name</div>
+                                <span class="font-mono text-steel small">@p.Sku</span>
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border">@p.Category</span>
+                                <span class="badge-pill-neutral font-mono">@p.Category</span>
                             </td>
                             <td class="font-mono fw-semibold">
                                 ₹@p.UnitPrice.ToString("N2")
                             </td>
                             <td>
-                                <span class="text-muted small">@p.WarrantyDays days</span>
+                                <span class="text-steel small">@p.WarrantyDays days</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge @stockHealthClass fs-6 px-3 py-1.5 font-mono">
+                                <span class="badge-pill-dark font-mono px-3 py-1">
                                     @p.CurrentStockOnHand
                                 </span>
                             </td>
                             <td class="text-center">
                                 @if (p.DamagedStockCount > 0)
                                 {
-                                    <span class="badge bg-danger fs-6 px-3 py-1.5 font-mono">
+                                    <span class="badge-pill-coral font-mono px-3 py-1">
                                         @p.DamagedStockCount
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 font-mono">
+                                    <span class="badge-pill-neutral font-mono px-3 py-1 text-steel">
                                         0
                                     </span>
                                 }
                             </td>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="progress flex-grow-1" style="height: 6px;">
-                                        <div class="progress-bar @(p.ReturnRatePercent > 10 ? "bg-danger" : "bg-primary")" 
+                                <div class="d-flex align-items-center gap-2" style="max-width: 180px;">
+                                    <div class="progress flex-grow-1" style="height: 5px; background: #e2e8f0; border-radius: 9999px;">
+                                        <div class="progress-bar @(p.ReturnRatePercent > 10 ? "bg-danger" : "bg-dark")" 
                                              role="progressbar" 
-                                             style="width: @Math.Min(100, p.ReturnRatePercent * 3)%;"></div>
+                                             style="width: @Math.Min(100, p.ReturnRatePercent * 3)%; border-radius: 9999px;"></div>
                                     </div>
                                     <span class="font-mono fw-bold @returnRateColor small">@p.ReturnRatePercent%</span>
                                 </div>
-                                <span class="text-muted fs-xs">@p.ApprovedRmaCount approved / @p.TotalRmaCount total RMAs</span>
+                                <span class="text-steel fs-micro d-block mt-0.5">@p.ApprovedRmaCount approved / @p.TotalRmaCount total RMAs</span>
                             </td>
                             <td>
                                 @if (p.CurrentStockOnHand > 50)
                                 {
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                    <span class="badge-pill-neutral text-success">
                                         <i class="bi bi-check2-circle me-1"></i> Optimal Stock
                                     </span>
                                 }
                                 else if (p.CurrentStockOnHand > 15)
                                 {
-                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                                    <span class="badge-pill-neutral text-dark">
                                         <i class="bi bi-info-circle me-1"></i> Normal
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                    <span class="badge-pill-coral">
                                         <i class="bi bi-exclamation-triangle me-1"></i> Reorder Alert
                                     </span>
                                 }
