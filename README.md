@@ -1,4 +1,4 @@
-# ReturnFlow AI — Intelligent B2B/B2C RMA & Reverse Logistics Engine
+# ReturnFlow AI - Intelligent B2B/B2C RMA & Reverse Logistics Engine
 
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0_LTS-512bd4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![ASP.NET Core MVC & Web API](https://img.shields.io/badge/ASP.NET_Core-MVC_%2B_API-blue?style=flat-square)](https://dotnet.microsoft.com/apps/aspnet)
@@ -241,6 +241,34 @@ Built without heavy SPA frameworks to showcase mastery of core web fundamentals:
 * **Direct DOM Manipulation:** Dynamic line item rendering, reactive filter bars, animated badge state transitions, and responsive toast notifications.
 * **Fetch API:** Asynchronous API communications with error handling and loading spinner orchestration.
 * **CSS Component Design:** Dynamic sentiment meter using hue gradients, enterprise KPI ribbons, and split-pane slide-over inspector.
+
+---
+
+## 🎨 Editorial Design System & Advanced Capabilities
+
+ReturnFlow AI features a design language inspired by editorial AI platforms like MiniMax:
+
+* **Typography & Palette:** Geometric **DM Sans** body type paired with **JetBrains Mono** for financial/SKU figures. Stark monochrome canvas (`#ffffff` canvas, `#0a0a0a` deep ink) broken open by 32px corner-radius vibrant gradient showcase cards.
+* **Pure Pill Architecture:** Universal pill-shaped buttons (`rounded-full`), segmented pill tabs, and pill badges across every screen.
+
+### 5 Advanced Operational Upgrades
+
+1. **Interactive Carrier Return Shipping Label Modal:**
+   * Delhivery Express priority reverse logistics manifest modal.
+   * Scalable vector Code-128 barcode representation and dedicated `@media print` layout for one-click physical label printing.
+2. **Interactive Policy Sandbox & Window Simulator:**
+   * Live interactive slider (1 to 400 days) allowing immediate recalculation of 30-day return cutoffs, warranty status, and estimated restocking fees in the DOM before filing.
+3. **Minimalist Chart.js Operations Analytics:**
+   * Compact 200px responsive charts: Donut chart displaying Defect Category Distribution and Bar chart displaying Financial Risk by Channel in INR.
+4. **Drag and Drop Photo Evidence Upload Zone:**
+   * Interactive file dropzone with instant thumbnail rendering, simulated damage pattern scanning, and simulated OCR serial extraction.
+5. **Power-User Keyboard Shortcuts:**
+   * Streamlined keyboard navigation for warehouse operators:
+     * `[A]` Approve & Sync stock
+     * `[R]` Reject return claim
+     * `[J]` / `[K]` Cycle down/up through table rows
+     * `[/]` Quick-focus search input
+     * `[Esc]` Close inspector drawer or blur input
 
 ---
 
