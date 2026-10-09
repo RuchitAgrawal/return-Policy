@@ -1,0 +1,20 @@
+services:
+  returnflow-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: returnflow-ai:latest
+    container_name: returnflow_ai_app
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Database__Provider=Sqlite
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/returnflow.db
+      - AI__OpenAiApiKey=${OPENAI_API_KEY:-}
+    volumes:
+      - returnflow-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  returnflow-data:

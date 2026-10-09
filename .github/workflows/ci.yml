@@ -1,0 +1,31 @@
+name: .NET CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (.NET 10.0)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        include-prerelease: true
+
+    - name: Restore Dependencies
+      run: dotnet restore ReturnFlow.sln
+
+    - name: Build Solution
+      run: dotnet build ReturnFlow.sln --configuration Release --no-restore
+
+    - name: Execute Unit Tests
+      run: dotnet test ReturnFlow.sln --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
