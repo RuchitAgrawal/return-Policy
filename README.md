@@ -1,4 +1,4 @@
-# ReturnFlow AI - Intelligent B2B/B2C RMA & Reverse Logistics Engine
+# ReturnFlow - Enterprise B2B/B2C Reverse Logistics & Inventory Engine
 
 [![.NET 10.0](https://img.shields.io/badge/.NET-10.0_LTS-512bd4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![ASP.NET Core MVC & Web API](https://img.shields.io/badge/ASP.NET_Core-MVC_%2B_API-blue?style=flat-square)](https://dotnet.microsoft.com/apps/aspnet)
@@ -12,7 +12,7 @@
 
 Product sellers and multichannel brands lose significant gross margin to **Return Merchandise Authorization (RMA) friction**, fraudulent warranty claims, and inefficient reverse logistics routing. 
 
-**ReturnFlow AI** is a production-grade enterprise engine built on **.NET 10.0 LTS**. It combines **strict deterministic SQL domain rules** (delivery date cutoffs, multi-channel restocking fees, warranty limits) with **probabilistic LLM reasoning** (unstructured complaint triage, sentiment quantification, fraud scoring, and warehouse routing) to eliminate manual returns processing overhead.
+**ReturnFlow** is a production-grade enterprise engine built on **.NET 10.0 LTS**. It combines **strict deterministic SQL domain rules** (delivery date cutoffs, multi-channel restocking fees, warranty limits) with **probabilistic LLM reasoning** (unstructured complaint triage, sentiment quantification, fraud scoring, and warehouse routing) to eliminate manual returns processing overhead.
 
 ---
 
@@ -72,7 +72,7 @@ flowchart TD
 
 A fundamental design flaw in naive "AI returns" apps is allowing the language model to decide financial and policy eligibility. An LLM can hallucinate that an item purchased 400 days ago is within a 30-day return policy.
 
-**ReturnFlow AI solves this via Grounded Hybrid Architecture:**
+**ReturnFlow solves this via Grounded Hybrid Architecture:**
 
 ```
   Customer Complaint (Unstructured Text)
@@ -246,7 +246,7 @@ Built without heavy SPA frameworks to showcase mastery of core web fundamentals:
 
 ## 🎨 Editorial Design System & Advanced Capabilities
 
-ReturnFlow AI features a design language inspired by editorial AI platforms like MiniMax:
+ReturnFlow features a design language inspired by editorial platforms like MiniMax:
 
 * **Typography & Palette:** Geometric **DM Sans** body type paired with **JetBrains Mono** for financial/SKU figures. Stark monochrome canvas (`#ffffff` canvas, `#0a0a0a` deep ink) broken open by 32px corner-radius vibrant gradient showcase cards.
 * **Pure Pill Architecture:** Universal pill-shaped buttons (`rounded-full`), segmented pill tabs, and pill badges across every screen.
