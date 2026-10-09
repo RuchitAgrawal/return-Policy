@@ -194,10 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
         policySandboxSlider.addEventListener('input', (e) => {
             updatePolicySliderDisplay(parseInt(e.target.value, 10));
         });
+
+        document.querySelectorAll('.btn-snap-day').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const days = parseInt(btn.getAttribute('data-days'), 10);
+                policySandboxSlider.value = days;
+                updatePolicySliderDisplay(days);
+            });
+        });
     }
 
     function updatePolicySliderDisplay(days) {
-        sliderDaysDisplay.textContent = `${days} Days Ago`;
+        sliderDaysDisplay.textContent = days === 0 ? 'Delivered Today' : `${days} Days Ago`;
 
         if (days <= 30) {
             simulatedWindowNote.textContent = 'Standard Return Window Active (30 Days)';
@@ -206,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             simReturnBadge.textContent = 'Eligible for Return';
             simReturnBadge.className = 'badge-pill-success';
         } else if (days <= 365) {
-            simulatedWindowNote.textContent = 'Return Window Closed • Warranty Only Active';
+            simulatedWindowNote.textContent = 'Return Window Closed • Warranty Active';
             simWarrantyBadge.textContent = 'In Warranty';
             simWarrantyBadge.className = 'badge-pill-success';
             simReturnBadge.textContent = '30-Day Window Closed';

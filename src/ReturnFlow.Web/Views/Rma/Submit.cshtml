@@ -1,81 +1,131 @@
 @{
-    ViewData["Title"] = "Customer Return Portal";
+    ViewData["Title"] = "Customer Returns & Warranty Portal";
 }
 
 <div class="container py-3">
     <!-- Header Hero Section -->
-    <div class="mb-4 pb-2">
-        <span class="fs-micro text-steel d-block mb-1">Customer Self-Service Interface</span>
-        <h1 class="hero-display mb-2">Self-Service Return Authorization.</h1>
-        <p class="text-charcoal lead mb-0" style="font-size: 1.15rem; max-width: 760px;">
-            Cross-reference customer claims against relational SQL order and warranty data.
-            AI quantifies sentiment, flags fraud, and routes reverse logistics in real time.
+    <div class="mb-4 pb-1">
+        <span class="fs-micro text-steel d-block mb-1">Customer Self-Service</span>
+        <h1 class="hero-display mb-2">Returns & Warranty Portal</h1>
+        <p class="text-charcoal lead mb-0" style="font-size: 1.1rem; max-width: 760px;">
+            Lookup your order to verify return eligibility, request a replacement, or generate a prepaid carrier shipping label.
         </p>
     </div>
 
-    <!-- 3 Saturated "Album Cover" Preset Cards (32px Rounded Hero) -->
-    <div class="mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="fs-micro text-steel">Interactive Test Scenarios (1-Click Auto-Fill)</span>
-            <span class="text-steel small">Click any tile to pre-load full relational order context</span>
+    <!-- Collapsible Developer Sandbox & Simulator -->
+    <div class="card-base p-3 mb-4 rounded-3 border">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge-pill-dark px-2.5 py-1 font-mono" style="font-size: 11px;">EVALUATION SANDBOX</span>
+                <span class="small fw-semibold text-dark">One-Click Test Scenarios & Policy Simulator</span>
+            </div>
+            <button type="button" class="btn-minimax-secondary" data-bs-toggle="collapse" data-bs-target="#sandboxCollapse" aria-expanded="false" style="padding: 6px 14px; font-size: 13px;">
+                <i class="bi bi-sliders me-1"></i> Toggle Sandbox Tools
+            </button>
         </div>
-        <div class="row g-3">
-            <!-- Preset 1: Volcanic Coral -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card-hero-coral h-100 d-flex flex-column justify-content-between" data-preset="warranty" id="cardPresetWarranty">
-                    <div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="hero-card-tag">Scenario 01 • Active Warranty</span>
-                            <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1003</span>
+
+        <div class="collapse mt-3 pt-3 border-top" id="sandboxCollapse">
+            <!-- 3 Test Scenario Cards -->
+            <div class="mb-4">
+                <span class="fs-micro text-steel d-block mb-2">Preset Edge-Case Scenarios</span>
+                <div class="row g-3">
+                    <!-- Preset 1 -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-hero-coral h-100 d-flex flex-column justify-content-between" data-preset="warranty" id="cardPresetWarranty">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="hero-card-tag">Scenario 01 • Active Warranty</span>
+                                    <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1003</span>
+                                </div>
+                                <h5 class="fw-bold mb-1">Hardware Failure</h5>
+                                <p class="small mb-3" style="opacity: 0.9;">
+                                    "Thunderbolt dock disconnects and smells like burnt plastic. Need replacement."
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
+                                <span class="small font-mono fw-semibold">B2B Wholesale • ₹18,500</span>
+                                <button type="button" class="btn-minimax-white">Auto-Fill</button>
+                            </div>
                         </div>
-                        <h4 class="fw-bold mb-1">Hardware Failure</h4>
-                        <p class="small mb-3" style="opacity: 0.9;">
-                            "The Thunderbolt dock keeps disconnecting every 10 minutes and smells like burnt plastic. Need replacement."
-                        </p>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
-                        <span class="small font-mono fw-semibold">B2B Wholesale • ₹18,500</span>
-                        <button type="button" class="btn-minimax-white">Auto-Fill</button>
+
+                    <!-- Preset 2 -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card-hero-magenta h-100 d-flex flex-column justify-content-between" data-preset="remorse" id="cardPresetRemorse">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="hero-card-tag">Scenario 02 • Opened Box Remorse</span>
+                                    <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1001</span>
+                                </div>
+                                <h5 class="fw-bold mb-1">15% Restocking Fee</h5>
+                                <p class="small mb-3" style="opacity: 0.9;">
+                                    "Opened box and tried keyboard for a week, dislike the tactile switch sound. Requesting refund."
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
+                                <span class="small font-mono fw-semibold">Shopify • ₹9,500</span>
+                                <button type="button" class="btn-minimax-white">Auto-Fill</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preset 3 -->
+                    <div class="col-lg-4 col-md-12">
+                        <div class="card-hero-blue h-100 d-flex flex-column justify-content-between" data-preset="fraud" id="cardPresetFraud">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="hero-card-tag">Scenario 03 • Physical Damage Abuse</span>
+                                    <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1002</span>
+                                </div>
+                                <h5 class="fw-bold mb-1">Abuse & Quarantine</h5>
+                                <p class="small mb-3" style="opacity: 0.9;">
+                                    "Dropped monitor down stairs while moving, screen shattered. Replace under warranty!"
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
+                                <span class="small font-mono fw-semibold">Amazon IN • ₹38,000</span>
+                                <button type="button" class="btn-minimax-white">Auto-Fill</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Preset 2: Music Magenta -->
-            <div class="col-lg-4 col-md-6">
-                <div class="card-hero-magenta h-100 d-flex flex-column justify-content-between" data-preset="remorse" id="cardPresetRemorse">
-                    <div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="hero-card-tag">Scenario 02 • Opened Box Remorse</span>
-                            <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1001</span>
-                        </div>
-                        <h4 class="fw-bold mb-1">15% Restocking Fee</h4>
-                        <p class="small mb-3" style="opacity: 0.9;">
-                            "Opened the box and tried keyboard for a week, but don't like the tactile switch sound. Want full refund."
-                        </p>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
-                        <span class="small font-mono fw-semibold">Shopify • ₹9,500</span>
-                        <button type="button" class="btn-minimax-white">Auto-Fill</button>
+            <!-- Calibrated Policy Window Simulator -->
+            <div class="p-3 bg-light rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <span class="fs-micro text-steel">Return Policy & Warranty Simulator</span>
+                    <span class="badge-pill-dark font-mono" id="sliderDaysDisplay">25 Days Ago</span>
+                </div>
+                
+                <!-- Quick Snap Buttons -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button type="button" class="btn-minimax-tertiary btn-snap-day py-1 px-2.5 small" data-days="5">Recent (5d)</button>
+                    <button type="button" class="btn-minimax-tertiary btn-snap-day py-1 px-2.5 small" data-days="25">Within 30d Window (25d)</button>
+                    <button type="button" class="btn-minimax-tertiary btn-snap-day py-1 px-2.5 small" data-days="90">Warranty Active (90d)</button>
+                    <button type="button" class="btn-minimax-tertiary btn-snap-day py-1 px-2.5 small" data-days="380">Policy Expired (380d)</button>
+                </div>
+
+                <!-- Range Slider with Calibrated Visual Markers -->
+                <div class="position-relative mb-2">
+                    <input type="range" class="form-range" id="policySandboxSlider" min="0" max="400" value="25">
+                    <div class="position-relative w-100" style="height: 20px;">
+                        <span class="position-absolute small font-mono text-steel" style="left: 0%;">0d</span>
+                        <span class="position-absolute small font-mono text-danger fw-bold" style="left: 7.5%; transform: translateX(-50%);">30d (Cutoff)</span>
+                        <span class="position-absolute small font-mono text-steel d-none d-sm-inline" style="left: 45%; transform: translateX(-50%);">180d</span>
+                        <span class="position-absolute small font-mono text-primary fw-bold" style="left: 91.25%; transform: translateX(-50%);">365d (Warranty)</span>
+                        <span class="position-absolute small font-mono text-steel" style="right: 0%;">400d</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- Preset 3: Hailuo Deep Blue -->
-            <div class="col-lg-4 col-md-12">
-                <div class="card-hero-blue h-100 d-flex flex-column justify-content-between" data-preset="fraud" id="cardPresetFraud">
+                <div class="p-2.5 bg-white rounded-3 border border-light-subtle d-flex flex-wrap gap-2 align-items-center justify-content-between mt-2">
                     <div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="hero-card-tag">Scenario 03 • Suspected Fraud</span>
-                            <span class="badge-pill-dark" style="background: rgba(0,0,0,0.3); font-size: 11px;">ORD-2026-1002</span>
-                        </div>
-                        <h4 class="fw-bold mb-1">Abuse & Quarantine</h4>
-                        <p class="small mb-3" style="opacity: 0.9;">
-                            "Dropped monitor down stairs while moving, screen shattered. Replace under warranty or I'll post bad reviews!"
-                        </p>
+                        <span class="small text-steel d-block">Window Calculation:</span>
+                        <span class="fw-semibold small" id="simulatedWindowNote">Standard Return Window Active (30 Days)</span>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
-                        <span class="small font-mono fw-semibold">Amazon IN • ₹38,000</span>
-                        <button type="button" class="btn-minimax-white">Auto-Fill</button>
+                    <div class="d-flex gap-2" id="simulatedBadgesContainer">
+                        <span class="badge-pill-success" id="simWarrantyBadge">In Warranty</span>
+                        <span class="badge-pill-success" id="simReturnBadge">Eligible for Return</span>
                     </div>
                 </div>
             </div>
@@ -84,13 +134,13 @@
 
     <!-- Main Working Grid: Form vs Live Result -->
     <div class="row g-4">
-        <!-- Left: Form Controls (Quiet White Card Family) -->
+        <!-- Left: Form Controls -->
         <div class="col-lg-7">
             <!-- Step 1: Order Lookup -->
             <div class="card-base mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="fs-micro text-steel">Step 01 / Order Lookup</span>
-                    <span class="badge-pill-neutral">Relational SQL Sync</span>
+                    <span class="badge-pill-neutral">Relational Order Sync</span>
                 </div>
                 
                 <div class="input-group mb-2">
@@ -103,9 +153,9 @@
                 <div id="lookupAlert" class="mt-2 text-danger small d-none"></div>
 
                 <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top border-light-subtle">
-                    <span class="small text-steel">Seeded Orders:</span>
+                    <span class="small text-steel">Demo Quick Pick:</span>
                     <select id="demoOrderSelect" class="form-select form-select-sm" style="max-width: 320px; font-size: 13px;">
-                        <option value="">Quick pick order...</option>
+                        <option value="">Select order...</option>
                         <option value="ORD-2026-1001">ORD-2026-1001 (5d ago, Shopify, Keyboard)</option>
                         <option value="ORD-2026-1002">ORD-2026-1002 (22d ago, AmazonIN, 4K Monitor)</option>
                         <option value="ORD-2026-1003">ORD-2026-1003 (75d ago, B2B, 10x TB4 Docks)</option>
@@ -115,35 +165,7 @@
                 </div>
             </div>
 
-            <!-- Feature 2: Interactive Return Policy Sandbox / Simulator -->
-            <div class="card-surface mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fs-micro text-steel">Interactive Policy Simulator</span>
-                    <span class="badge-pill-dark font-mono" id="sliderDaysDisplay">75 Days Ago</span>
-                </div>
-                <p class="small text-steel mb-3">
-                    Drag the delivery window slider to test the deterministic C# policy engine calculations in real time.
-                </p>
-                <input type="range" class="form-range" id="policySandboxSlider" min="1" max="420" value="75">
-                <div class="d-flex justify-content-between fs-micro text-steel mt-1 mb-3">
-                    <span>Day 1 (Recent)</span>
-                    <span>Day 30 (Cutoff)</span>
-                    <span>Day 365 (Warranty)</span>
-                    <span>Day 420 (Expired)</span>
-                </div>
-                <div class="p-3 bg-white rounded-3 border border-light-subtle d-flex flex-wrap gap-2 align-items-center justify-content-between">
-                    <div>
-                        <span class="small text-steel d-block">Simulated Window Eligibility:</span>
-                        <span class="fw-semibold small" id="simulatedWindowNote">Warranty Coverage Active</span>
-                    </div>
-                    <div class="d-flex gap-2" id="simulatedBadgesContainer">
-                        <span class="badge-pill-success" id="simWarrantyBadge">In Warranty</span>
-                        <span class="badge-pill-neutral" id="simReturnBadge">30-Day Window Closed</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Line Item Selection (Populated by JS) -->
+            <!-- Step 2: Line Item Selection -->
             <div class="card-base mb-4 d-none" id="step2Container">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="fs-micro text-steel">Step 02 / Item Selection</span>
@@ -152,16 +174,16 @@
                 <div id="lineItemsContainer" class="d-flex flex-column gap-2 mb-2"></div>
             </div>
 
-            <!-- Step 3: Return Form & Evidence Upload -->
+            <!-- Step 3: Return Reason & Evidence Upload -->
             <div class="card-base d-none" id="step3Container">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fs-micro text-steel">Step 03 / Complaint & Proof</span>
-                    <span class="badge-pill-neutral">LLM Grounding</span>
+                    <span class="fs-micro text-steel">Step 03 / Return Reason & Evidence</span>
+                    <span class="badge-pill-neutral">Claim Details</span>
                 </div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label fs-micro text-steel mb-1">Customer Condition</label>
+                        <label class="form-label fs-micro text-steel mb-1">Condition of Item</label>
                         <select id="conditionSelect" class="form-select form-select-minimax">
                             <option value="Unopened">Unopened (Factory Sealed)</option>
                             <option value="OpenedUnused">Opened / Like New (Unused)</option>
@@ -178,7 +200,7 @@
                     </div>
                 </div>
 
-                <!-- Feature 4: Drag & Drop Photo Evidence Upload Simulation -->
+                <!-- Drag & Drop Photo Evidence Dropzone -->
                 <div class="mb-3">
                     <label class="form-label fs-micro text-steel mb-1">Product Photo or Proof (Optional)</label>
                     <div class="upload-dropzone" id="uploadDropzone">
@@ -200,24 +222,24 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="complaintText" class="form-label fs-micro text-steel mb-1">Customer Complaint (Unstructured Text)</label>
-                    <textarea id="complaintText" class="form-control form-control-minimax" rows="4" placeholder="Describe the product malfunction, damage, or return reason in plain words..."></textarea>
+                    <label for="complaintText" class="form-label fs-micro text-steel mb-1">Reason for Return (Description)</label>
+                    <textarea id="complaintText" class="form-control form-control-minimax" rows="4" placeholder="Describe the defect, condition, or reason for return..."></textarea>
                 </div>
 
                 <button class="btn-minimax-primary w-100 py-3" id="btnSubmitRma">
-                    <i class="bi bi-cpu fs-6"></i>
-                    <span>Submit for Structured AI Triage</span>
+                    <i class="bi bi-arrow-right-circle fs-6 me-1"></i>
+                    <span>Submit Return Claim</span>
                 </button>
             </div>
         </div>
 
-        <!-- Right: AI Triage Structured Assessment & Carrier Slip -->
+        <!-- Right: Triage Assessment & Shipping Label -->
         <div class="col-lg-5">
             <!-- Loading State -->
             <div class="card-base p-5 text-center d-none" id="loadingPanel">
                 <div class="spinner-border text-dark mb-3" style="width: 2.75rem; height: 2.75rem;" role="status"></div>
-                <h5 class="fw-bold mb-1">Executing Structured AI Triage</h5>
-                <p class="text-steel small mb-0">Cross-referencing delivery dates in SQL and evaluating fraud risk markers...</p>
+                <h5 class="fw-bold mb-1">Verifying Return Eligibility</h5>
+                <p class="text-steel small mb-0">Cross-referencing delivery window, warranty duration, and policy rules...</p>
             </div>
 
             <!-- Empty Placeholder -->
@@ -225,8 +247,8 @@
                 <div class="text-steel mb-3" style="opacity: 0.35;">
                     <i class="bi bi-shield-check" style="font-size: 3.5rem;"></i>
                 </div>
-                <h6 class="fw-bold mb-1">No Active Triage Result</h6>
-                <p class="text-steel small mb-0">Select an order line item and submit a complaint to generate a structured AI policy audit.</p>
+                <h6 class="fw-bold mb-1">No Active Claim</h6>
+                <p class="text-steel small mb-0">Select an order line item and submit your return details to generate an authorization.</p>
             </div>
 
             <!-- Result Card Container -->
@@ -234,7 +256,7 @@
                 <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom border-light-subtle">
                     <div>
                         <span class="fs-micro text-steel font-mono d-block" id="resTicketNumber">RMA-0000</span>
-                        <h5 class="fw-bold mb-0">Audit Assessment</h5>
+                        <h5 class="fw-bold mb-0">Claim Authorization</h5>
                     </div>
                     <span class="badge-pill-dark" id="resStatusBadge">Status</span>
                 </div>
@@ -253,18 +275,18 @@
                     </div>
                 </div>
 
-                <!-- AI Extracted Properties -->
+                <!-- Structured Properties -->
                 <div class="d-flex flex-column gap-2 mb-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="small text-steel">Defect Category:</span>
+                        <span class="small text-steel">Defect Classification:</span>
                         <span class="badge-pill-neutral font-mono" id="resDefectCategory">--</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="small text-steel">Fraud Risk:</span>
+                        <span class="small text-steel">Risk Assessment:</span>
                         <span class="badge-pill-dark" id="resFraudRiskBadge">--</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="small text-steel">Recommendation:</span>
+                        <span class="small text-steel">Action:</span>
                         <span class="badge-pill-neutral fw-semibold" id="resRecommendedAction">--</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
@@ -276,7 +298,7 @@
                 <!-- Sentiment Gauge -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center small mb-1">
-                        <span class="text-steel">Frustration / Escalation Score:</span>
+                        <span class="text-steel">Customer Urgency / Sentiment:</span>
                         <span class="fw-bold font-mono" id="resSentimentValue">0/10</span>
                     </div>
                     <div class="sentiment-gauge-editorial">
@@ -284,19 +306,19 @@
                     </div>
                 </div>
 
-                <!-- AI Reasoning Summary -->
+                <!-- Reasoning Summary -->
                 <div class="mb-3">
-                    <label class="fs-micro text-steel d-block mb-1">Audit Reasoning</label>
+                    <label class="fs-micro text-steel d-block mb-1">Policy Assessment</label>
                     <div class="p-2.5 bg-light rounded-3 small text-charcoal" id="resReasoningText"></div>
                 </div>
 
-                <!-- Drafted Customer Email -->
+                <!-- Customer Email Communication -->
                 <div class="mb-4">
-                    <label class="fs-micro text-steel d-block mb-1">Drafted Customer Communication</label>
+                    <label class="fs-micro text-steel d-block mb-1">Customer Communication</label>
                     <textarea class="form-control form-control-minimax small font-mono bg-light" id="resDraftedEmail" rows="3" readonly></textarea>
                 </div>
 
-                <!-- Feature 1: Trigger Carrier Return Shipping Label -->
+                <!-- Carrier Shipping Label Modal Trigger -->
                 <button type="button" class="btn-minimax-secondary w-100" id="btnOpenCarrierLabel">
                     <i class="bi bi-printer me-1"></i>
                     <span>Generate Carrier Shipping Slip</span>
@@ -306,7 +328,7 @@
     </div>
 </div>
 
-<!-- Feature 1: Carrier Return Shipping Label Modal -->
+<!-- Carrier Return Shipping Label Modal -->
 <div class="modal fade" id="carrierLabelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 p-3" style="border-radius: 20px;">
