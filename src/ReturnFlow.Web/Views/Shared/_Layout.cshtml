@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ReturnFlow AI</title>
+    <title>@ViewData["Title"] - ReturnFlow</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
@@ -18,24 +18,16 @@
     <!-- MiniMax Editorial Design System -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <!-- Top Announcement Banner -->
-    <div class="promo-banner text-center py-2 px-3">
-        <div class="d-inline-flex align-items-center gap-2">
-            <span class="badge-pill-dark bg-white text-dark py-0.5 px-2" style="font-size: 11px;">NEW</span>
-            <span>ReturnFlow v2.0 • Deterministic SQL Grounding + Structured AI Triage Active</span>
-        </div>
-    </div>
-
-    <!-- Stark White Navbar -->
+<body class="d-flex flex-column min-vh-100">
+    <!-- Stark White Clean Navbar -->
     <nav class="navbar navbar-expand-lg navbar-minimax sticky-top">
         <div class="container-fluid px-lg-4 px-3">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="/">
                 <span class="navbar-brand-mark">
-                    <i class="bi bi-arrow-repeat fs-6"></i>
+                    <i class="bi bi-box-seam-fill fs-6"></i>
                 </span>
                 <span class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 18px;">
-                    ReturnFlow <span class="badge-pill-neutral ms-1 py-0.5 px-2 font-mono" style="font-size: 11px;">AI</span>
+                    ReturnFlow
                 </span>
             </a>
             
@@ -52,12 +44,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-minimax @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" href="/Staff/Dashboard">
-                            <i class="bi bi-kanban me-1"></i> Operations Command
+                            <i class="bi bi-kanban me-1"></i> Returns Queue
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link nav-link-minimax @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Inventory" ? "active" : "")" href="/Staff/Inventory">
-                            <i class="bi bi-layers me-1"></i> Stock Ledger
+                            <i class="bi bi-layers me-1"></i> Inventory Ledger
                         </a>
                     </li>
                     <li class="nav-item">
@@ -68,22 +60,11 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-2">
-                    @if (AiService.IsLiveMode)
-                    {
-                        <span class="badge-pill-success">
-                            <span class="pulse-dot bg-success" style="width: 6px; height: 6px; border-radius: 50%;"></span>
-                            <span>Live OpenAI Active</span>
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge-pill-warning" title="Zero-config heuristic fallback. Set OPENAI_API_KEY to activate live model.">
-                            <span class="pulse-dot bg-warning" style="width: 6px; height: 6px; border-radius: 50%;"></span>
-                            <span>Zero-Config Heuristic Mock</span>
-                        </span>
-                    }
-                    <a href="https://github.com/RuchitAgrawal/return-Policy" target="_blank" class="btn-minimax-secondary ms-2" style="padding: 7px 16px; font-size: 13px;">
-                        <i class="bi bi-github"></i> GitHub
+                    <span class="badge-pill-neutral font-mono small text-steel px-3 py-1.5 d-none d-md-inline-flex align-items-center">
+                        <i class="bi bi-building me-1.5 text-steel"></i> Fulfillment Hub #04
+                    </span>
+                    <a href="/swagger" class="btn-minimax-tertiary" title="API Explorer" style="padding: 6px 14px; font-size: 13px;">
+                        <i class="bi bi-code-slash me-1"></i> API
                     </a>
                 </div>
             </div>
@@ -91,9 +72,30 @@
     </nav>
 
     <!-- Main Content Canvas -->
-    <main class="py-4">
+    <main class="py-4 flex-grow-1">
         @RenderBody()
     </main>
+
+    <!-- Clean Enterprise Footer -->
+    <footer class="border-top py-3 mt-auto bg-white">
+        <div class="container-fluid px-lg-4 px-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small text-steel">
+            <div class="d-flex align-items-center gap-2">
+                <span class="fw-semibold text-dark">ReturnFlow</span>
+                <span>•</span>
+                <span>Reverse Logistics & Multichannel Inventory Engine</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="d-inline-flex align-items-center gap-1.5">
+                    <span class="pulse-dot bg-success" style="width: 6px; height: 6px; border-radius: 50%;"></span>
+                    <span>System Operational</span>
+                </span>
+                <span>•</span>
+                <a href="https://github.com/RuchitAgrawal/return-Policy" target="_blank" class="text-steel text-decoration-none">
+                    <i class="bi bi-github me-1"></i> Repository
+                </a>
+            </div>
+        </div>
+    </footer>
 
     <!-- Global Toast Container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 1100;"></div>
