@@ -9,71 +9,88 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts -->
+    <!-- Google Fonts: DM Sans & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Custom Enterprise Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN for Minimalist Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- MiniMax Editorial Design System -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-surface text-main">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-slate border-bottom border-secondary-subtle sticky-top">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="/">
-                <span class="brand-icon d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3">
-                    <i class="bi bi-arrow-repeat fs-5"></i>
+<body>
+    <!-- Top Announcement Banner -->
+    <div class="promo-banner text-center py-2 px-3">
+        <div class="d-inline-flex align-items-center gap-2">
+            <span class="badge-pill-dark bg-white text-dark py-0.5 px-2" style="font-size: 11px;">NEW</span>
+            <span>ReturnFlow v2.0 • Deterministic SQL Grounding + Structured AI Triage Active</span>
+        </div>
+    </div>
+
+    <!-- Stark White Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-minimax sticky-top">
+        <div class="container-fluid px-lg-4 px-3">
+            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="/">
+                <span class="navbar-brand-mark">
+                    <i class="bi bi-arrow-repeat fs-6"></i>
                 </span>
-                <span>ReturnFlow <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-xs">AI</span></span>
+                <span class="fw-bold text-dark" style="letter-spacing: -0.5px; font-size: 18px;">
+                    ReturnFlow <span class="badge-pill-neutral ms-1 py-0.5 px-2 font-mono" style="font-size: 11px;">AI</span>
+                </span>
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navMain">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-1">
                     <li class="nav-item">
-                        <a class="nav-link text-nav fw-medium @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rma" ? "active" : "")" href="/Rma/Submit">
+                        <a class="nav-link nav-link-minimax @(ViewContext.RouteData.Values["controller"]?.ToString() == "Rma" ? "active" : "")" href="/Rma/Submit">
                             <i class="bi bi-box-arrow-in-left me-1"></i> Customer Portal
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-nav fw-medium @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" href="/Staff/Dashboard">
-                            <i class="bi bi-kanban me-1"></i> Staff Dashboard
+                        <a class="nav-link nav-link-minimax @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")" href="/Staff/Dashboard">
+                            <i class="bi bi-kanban me-1"></i> Operations Command
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-nav fw-medium @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Inventory" ? "active" : "")" href="/Staff/Inventory">
-                            <i class="bi bi-layers me-1"></i> Inventory Ledger
+                        <a class="nav-link nav-link-minimax @(ViewContext.RouteData.Values["controller"]?.ToString() == "Staff" && ViewContext.RouteData.Values["action"]?.ToString() == "Inventory" ? "active" : "")" href="/Staff/Inventory">
+                            <i class="bi bi-layers me-1"></i> Stock Ledger
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-nav fw-medium" href="/swagger" target="_blank">
-                            <i class="bi bi-code-square me-1"></i> Swagger API
+                        <a class="nav-link nav-link-minimax" href="/swagger" target="_blank">
+                            <i class="bi bi-terminal me-1"></i> API Docs
                         </a>
                     </li>
                 </ul>
 
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
                     @if (AiService.IsLiveMode)
                     {
-                        <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3 py-2 d-inline-flex align-items-center gap-2">
-                            <span class="pulse-dot bg-success"></span>
-                            <span class="fw-semibold">Live OpenAI Active</span>
+                        <span class="badge-pill-success">
+                            <span class="pulse-dot bg-success" style="width: 6px; height: 6px; border-radius: 50%;"></span>
+                            <span>Live OpenAI Active</span>
                         </span>
                     }
                     else
                     {
-                        <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning px-3 py-2 d-inline-flex align-items-center gap-2" title="Zero-config deterministic fallback enabled. Set OPENAI_API_KEY to activate live LLM.">
-                            <span class="pulse-dot bg-warning"></span>
-                            <span class="fw-semibold">Zero-Config Mock AI</span>
+                        <span class="badge-pill-warning" title="Zero-config heuristic fallback. Set OPENAI_API_KEY to activate live model.">
+                            <span class="pulse-dot bg-warning" style="width: 6px; height: 6px; border-radius: 50%;"></span>
+                            <span>Zero-Config Heuristic Mock</span>
                         </span>
                     }
+                    <a href="https://github.com/RuchitAgrawal/return-Policy" target="_blank" class="btn-minimax-secondary ms-2" style="padding: 7px 16px; font-size: 13px;">
+                        <i class="bi bi-github"></i> GitHub
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content Canvas -->
     <main class="py-4">
         @RenderBody()
     </main>
